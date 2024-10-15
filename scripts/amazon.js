@@ -41,7 +41,7 @@ products.forEach((product) => {
 
         <div class="product-spacer"></div>
 
-        <div class="added-to-cart">
+        <div class="added-to-cart  added-to-cart-${product.id}">
           <img src="images/icons/checkmark.png">
           Added
         </div>
@@ -56,12 +56,13 @@ products.forEach((product) => {
 // Display each Product in the Webpage
 document.querySelector('.js-products-grid').innerHTML = productsHTML;
 
+const addedMessageTimeouts = {};
+
 document.querySelectorAll('.js-add-to-cart').forEach((button) => {
   button.addEventListener('click', () => {
 
-  const productId = button.dataset.productId; 
+  const { productId } = button.dataset; 
 
-  console.log(productId);
   let matchingItem;
 
   cart.forEach((item) => {
@@ -71,21 +72,35 @@ document.querySelectorAll('.js-add-to-cart').forEach((button) => {
   });
 
   const productQuantity = document.querySelector(`.js-quantity-selector-${productId}`);
-  const selectedValue = productQuantity.value;
+  const quantity = Number(productQuantity.value);
 
-  console.log(selectedValue);
+  
+ // "added to cart" feature
+  const previousTimeoutId = addedMessageTimeouts[productId];
 
-
-  if (matchingItem) {
-    matchingItem.quantity += Number(selectedValue);
-  } else {
-    cart.push({
-      productId: productId,
-      quantity: 1
-      });
+  if (previousTimeoutId) {
+    clearTimeout(previousTimeoutId);
   }
 
+  const addMessage = document.querySelector(`.added-to-cart-${productId}`);
+  addMessage.classList.add('show');
 
+  let timeoutId = setTimeout(() => {
+    addMessage.classList.remove('show');
+  }, 2000);
+
+  addedMessageTimeouts[productId] = timeoutId;
+
+
+  
+  if (matchingItem) {
+    matchingItem.quantity += quantity;
+  } else {
+    cart.push({
+      productId,
+      quantity
+      });
+  }
   // update the cart quantity ui
   let cartQuantity = 0;
     
@@ -94,5 +109,11 @@ document.querySelectorAll('.js-add-to-cart').forEach((button) => {
   });
 
   document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
+
   });
 });
+
+
+
+
+
