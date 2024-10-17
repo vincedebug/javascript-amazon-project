@@ -98,27 +98,23 @@ cart.forEach((cartItem) => {
     </div>`;
 });
 
+// Display the the item in the cart in HTML
 document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
 
-
-
+// Delete the item in the cart
 document.querySelectorAll('.js-delete-link')
   .forEach((link) => {
     link.addEventListener('click', () => {
-
       const productId = link.dataset.productId;
-
       removeFromCart(productId);
-
       const container = document.querySelector(`.js-cart-item-container-${productId}`);
-
       container.remove();
-
       updateCart();
                                         
     });
 });
 
+// This function is used to change the ui of the cart in the checkout page
 function updateCart() {
   const quantity = calculateCartQuantity();
   document.querySelector('.js-return-to-home-link')
@@ -127,42 +123,38 @@ function updateCart() {
 
 updateCart();
 
-
+// When clicking the update the save button will appear
+// and the input for updating the quantity of the item
 document.querySelectorAll('.js-update-quantity-link')
   .forEach((link) => {
     link.addEventListener('click', () => {
       const productId = link.dataset.productId;
-
       const container = document.querySelector(`.js-cart-item-container-${productId}`);
       container.classList.add('is-editing-quantity');
     });
   });
 
+// save the 
 document.querySelectorAll('.js-save-link').forEach((link) => {
   link.addEventListener('click', () => {
-    // get the product Id
     const productId = link.id;
     updateQuantityCart(productId);
-
   });
-
 });
 
-
+// this is used to save the input number when enter is pressed
 document.querySelectorAll('.quantity-input').forEach((link) => {
   link.addEventListener('keydown', (event) => {
-    // get the product Id
-    
+   
     const productId = link.id;
-
     if (event.key == 'Enter') {
       updateQuantityCart(productId);
     }
-
   });
-
 });
 
+
+// This is the function to update the quantity in the checkout 
 function updateQuantityCart(productId) {
       const container = document.querySelector(`.js-cart-item-container-${productId}`);
 
@@ -181,11 +173,9 @@ function updateQuantityCart(productId) {
       }
 
       updateQuantity(productId, newQuantity);
-
       const quantityLabel = document.querySelector(
         `.js-quantity-label-${productId}`
       );
-
       quantityLabel.innerHTML = newQuantity;
 
       updateCart();
