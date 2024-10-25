@@ -2,10 +2,14 @@ import { addToCart, calculateCartQuantity } from '../data/cart.js';
 import { products } from '../data/products.js';
 import { formatCurrency } from './utils/money.js';
 
+var dateToday = dayjs().date();
 
+console.log(dateToday);
+// The variable to every products 
 let productsHTML = '';
 
-// HTML template for each product
+// HTML template for each product 
+// Loops to every product in the data
 products.forEach((product) => {
   productsHTML += `
     <div class="product-container">
@@ -61,10 +65,10 @@ products.forEach((product) => {
 // Display each Product in the Webpage
 document.querySelector('.js-products-grid').innerHTML = productsHTML;
 
-
 // Show the add to Cart Message "Added"
 const addedMessageTimeouts = {};
 
+// Function to show the added to cart icon 
 function addToCartShow(productId) {
   const previousTimeoutId = addedMessageTimeouts[productId];
 
@@ -87,7 +91,7 @@ document.querySelectorAll('.js-add-to-cart').forEach((button) => {
   button.addEventListener('click', () => {
 
   const { productId } = button.dataset; 
-
+  // Add to cart object
   addToCart(productId);
 
   updateCart();
@@ -97,6 +101,7 @@ document.querySelectorAll('.js-add-to-cart').forEach((button) => {
   });
 });
 
+// Update the cart image with the number on the cart
 function updateCart() {
   const quantity = calculateCartQuantity();
   document.querySelector('.js-cart-quantity').innerHTML = quantity;
