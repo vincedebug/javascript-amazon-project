@@ -175,9 +175,6 @@ document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
 // Display the Payment Summary in HTML
 document.querySelector('.js-payment-summary').innerHTML = orderSummaryHTML();
 
-
-
-
 // Delete the item in the cart
 document.querySelectorAll('.js-delete-link')
   .forEach((link) => {
@@ -199,6 +196,7 @@ function updateCart() {
 .innerHTML = `${quantity} items`;
 }
 
+// function to update the total orders in payment summary
 function updateTotalOrder() {
   const quantity = calculateCartQuantity();
   document.querySelector('.js-total-items').innerHTML = `Items (${quantity}):`;
