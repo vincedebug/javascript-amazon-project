@@ -4,6 +4,11 @@ import { formatCurrency } from './utils/money.js';
 import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 import { deliveryOptions } from '../data/deliveryOptions.js';
 
+const today = dayjs();
+const deliveryDate = today.add(7, 'days');
+const deliveryDateString = deliveryDate.format('dddd, MMMM D');
+
+
 
 // html template with data
 let cartSummaryHTML = '';
@@ -22,7 +27,7 @@ cart.forEach((cartItem) => {
     }
   });
 
-  const deliveryOptionId = cartItem.deliveryOptionId;
+  const deliveryOptionId = cartItem.deliveryOptionsId;
 
   let deliveryOption;
 
@@ -34,12 +39,10 @@ cart.forEach((cartItem) => {
 
   const today = dayjs();
   const deliveryDate = today.add(
-    deliveryOption.deliveryDays,
+    deliveryOptions.deliveryDays,
     'days'
   );
-  const dateString = deliveryDate.format(
-    'dddd, MMMM D'
-  );
+  const dateString = deliveryDate.format('dddd, MMMM D');
 
   cartSummaryHTML += `<div class="cart-item-container js-cart-item-container-${matchingProduct.id}">
       <div class="delivery-date">
@@ -106,7 +109,7 @@ function deliveryOptionsHTML(matchingProduct, cartItem) {
     html += `
     <div class="delivery-option  js-delivery-option"
           data-product-id="${matchingProduct.id}"
-          data-delivery-option-id="${deliveryOptions.id}" >
+          data-delivery-option-id="${deliveryOption.id}" >
       <input type="radio"
         ${isChecked ? 'checked' : ''}
         class="delivery-option-input"
@@ -124,8 +127,56 @@ function deliveryOptionsHTML(matchingProduct, cartItem) {
   return html;
 }
 
+function orderSummaryHTML() {
+  let html = `
+            <div class="payment-summary-title">
+            Order Summary
+          </div>
+
+          <div class="payment-summary-row">
+            <div class="js-total-items">Items ():</div>
+            <div class="payment-summary-money">$42.75</div>
+          </div>
+
+          <div class="payment-summary-row">
+            <div>Shipping &amp; handling:</div>
+            <div class="payment-summary-money">$4.99</div>
+          </div>
+
+          <div class="payment-summary-row subtotal-row">
+            <div>Total before tax:</div>
+            <div class="payment-summary-money">$47.74</div>
+          </div>
+
+          <div class="payment-summary-row">
+            <div>Estimated tax (10%):</div>
+            <div class="payment-summary-money">$4.77</div>
+          </div>
+
+          <div class="payment-summary-row total-row">
+            <div>Order total:</div>
+            <div class="payment-summary-money">$52.51</div>
+          </div>
+
+          <button class="place-order-button button-primary">
+            Place your order
+          </button>
+  `;
+
+  return html;
+
+}
+
+
+
 // Display the the item in the cart in HTML
 document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
+
+// Display the Payment Summary in HTML
+document.querySelector('.js-payment-summary').innerHTML = orderSummaryHTML();
+
+
+
 
 // Delete the item in the cart
 document.querySelectorAll('.js-delete-link')
@@ -136,6 +187,7 @@ document.querySelectorAll('.js-delete-link')
       const container = document.querySelector(`.js-cart-item-container-${productId}`);
       container.remove();
       updateCart();
+      updateTotalOrder();
                                         
     });
 });
@@ -147,6 +199,13 @@ function updateCart() {
 .innerHTML = `${quantity} items`;
 }
 
+function updateTotalOrder() {
+  const quantity = calculateCartQuantity();
+  document.querySelector('.js-total-items').innerHTML = `Items (${quantity}):`;
+}
+
+
+updateTotalOrder();
 updateCart();
 
 // When clicking the update the save button will appear
@@ -160,13 +219,17 @@ document.querySelectorAll('.js-update-quantity-link')
     });
   });
 
-// save the 
+// save and update the cart quantity
 document.querySelectorAll('.js-save-link').forEach((link) => {
   link.addEventListener('click', () => {
     const productId = link.id;
     updateQuantityCart(productId);
+    updateTotalOrder();
   });
 });
+
+// updates the item in order summary
+document.querySelectorAll('.js-total-item').innerHTML = calculateCartQuantity();
 
 // this is used to save the input number when enter is pressed
 document.querySelectorAll('.quantity-input').forEach((link) => {
@@ -190,8 +253,6 @@ function updateQuantityCart(productId) {
       // get the value or new from the input
       const newQuantity = Number(document.querySelector(`.js-quantity-input-${productId}`).value);
 
-      console.log(newQuantity);
-
       // check the new quantity from the input
       if (newQuantity < 0 || newQuantity >= 1000) {
         alert('Quantity must be at least 0 and less than 1000');
@@ -208,22 +269,10 @@ function updateQuantityCart(productId) {
 
 }
 
-
-document.addEventListener('.js-delivery-option')
+document.querySelectorAll('.js-delivery-option')
   .forEach((element) => {
     element.addEventListener('click', () => {
-      updateDeliveryOption(productId, deliveryOptionsId);
+      const { productId, deliveryOptionId } = element.dataset;
+      updateDeliveryOption(productId, deliveryOptionId);
     });
-  })
-
-
-  
-
- 
-  
-
-
-
-
-  
-
+  });
